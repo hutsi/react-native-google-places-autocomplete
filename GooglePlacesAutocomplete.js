@@ -409,17 +409,21 @@ export default class GooglePlacesAutocomplete extends Component {
                 results = responseJSON.results;
               }
 
-              this.setState({
-                dataSource: this.buildRowsFromResults(results),
-              });
+              const dataSource = this.buildRowsFromResults(results);
+
+              if (this.props.onCurrentLocation) {
+                dataSource.length && this.props.onCurrentLocation(dataSource[0]);
+              } else {
+                this.setState({ dataSource });
+              }
             }
           }
           if (typeof responseJSON.error_message !== 'undefined') {
-              if(!this.props.onFail)
-                console.warn('google places autocomplete: ' + responseJSON.error_message);
-              else{
-                this.props.onFail(responseJSON.error_message)
-              }
+            if(!this.props.onFail)
+              console.warn('google places autocomplete: ' + responseJSON.error_message);
+            else{
+              this.props.onFail(responseJSON.error_message)
+            }
           }
         } else {
           // console.warn("google places autocomplete: request could not be completed or has been aborted");
@@ -444,7 +448,7 @@ export default class GooglePlacesAutocomplete extends Component {
 
       request.open('GET', url);
       if (this.props.query.origin !== null) {
-         request.setRequestHeader('Referer', this.props.query.origin)
+        request.setRequestHeader('Referer', this.props.query.origin)
       }
 
       request.send();
@@ -498,7 +502,7 @@ export default class GooglePlacesAutocomplete extends Component {
       }
       request.open('GET', 'https://maps.googleapis.com/maps/api/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
       if (this.props.query.origin !== null) {
-         request.setRequestHeader('Referer', this.props.query.origin)
+        request.setRequestHeader('Referer', this.props.query.origin)
       }
 
       request.send();
@@ -509,7 +513,7 @@ export default class GooglePlacesAutocomplete extends Component {
       });
     }
   }
-  
+
   clearText(){
     this.setState({
       text: ""
@@ -553,7 +557,7 @@ export default class GooglePlacesAutocomplete extends Component {
 
     return (
       <Text style={[this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {}]}
-        numberOfLines={this.props.numberOfLines}
+            numberOfLines={this.props.numberOfLines}
       >
         {this._renderDescription(rowData)}
       </Text>
@@ -601,7 +605,7 @@ export default class GooglePlacesAutocomplete extends Component {
         </TouchableHighlight>
       </ScrollView>
     );
-  }
+  };
 
   _renderSeparator = (sectionID, rowID) => {
     if (rowID == this.state.dataSource.length - 1) {
@@ -613,7 +617,7 @@ export default class GooglePlacesAutocomplete extends Component {
         key={ `${sectionID}-${rowID}` }
         style={[this.props.suppressDefaultStyles ? {} : defaultStyles.separator, this.props.styles.separator]} />
     );
-  }
+  };
 
   _onBlur = () => {
     this.triggerBlur();
@@ -621,7 +625,7 @@ export default class GooglePlacesAutocomplete extends Component {
     this.setState({
       listViewDisplayed: false
     });
-  }
+  };
 
   _onFocus = () => this.setState({ listViewDisplayed: true })
 
@@ -641,10 +645,10 @@ export default class GooglePlacesAutocomplete extends Component {
         />
       </View>
     );
-  }
+  };
 
   _shouldShowPoweredLogo = () => {
-    if (!this.props.enablePoweredByContainer || this.state.dataSource.length == 0) {
+    if (!this.props.enablePoweredByContainer || this.state.dataSource.length === 0) {
       return false
     }
 
@@ -657,19 +661,19 @@ export default class GooglePlacesAutocomplete extends Component {
     }
 
     return false
-  }
+  };
 
   _renderLeftButton = () => {
     if (this.props.renderLeftButton) {
       return this.props.renderLeftButton()
     }
-  }
+  };
 
   _renderRightButton = () => {
     if (this.props.renderRightButton) {
       return this.props.renderRightButton()
     }
-  }
+  };
 
   _getFlatList = () => {
     const keyGenerator = () => (
@@ -694,7 +698,8 @@ export default class GooglePlacesAutocomplete extends Component {
     }
 
     return null;
-  }
+  };
+
   render() {
     let {
       onFocus,
@@ -709,32 +714,32 @@ export default class GooglePlacesAutocomplete extends Component {
         pointerEvents="box-none"
       >
         {!this.props.textInputHide &&
-          <View
-            style={[this.props.suppressDefaultStyles ? {} : defaultStyles.textInputContainer, this.props.styles.textInputContainer]}
-          >
-            {this._renderLeftButton()}
-            <TextInputComp
-              ref="textInput"
-              editable={this.props.editable}
-              returnKeyType={this.props.returnKeyType}
-              keyboardAppearance={this.props.keyboardAppearance}
-              autoFocus={this.props.autoFocus}
-              style={[this.props.suppressDefaultStyles ? {} : defaultStyles.textInput, this.props.styles.textInput]}
-              value={this.state.text}
-              placeholder={this.props.placeholder}
-              onSubmitEditing={this.props.onSubmitEditing}
-              placeholderTextColor={this.props.placeholderTextColor}
-              onFocus={onFocus ? () => {this._onFocus(); onFocus()} : this._onFocus}
-              onBlur={this._onBlur}
-              underlineColorAndroid={this.props.underlineColorAndroid}
-              clearButtonMode={
-                clearButtonMode ? clearButtonMode : "while-editing"
-              }
-              { ...userProps }
-              onChangeText={this._handleChangeText}
-            />
-            {this._renderRightButton()}
-          </View>
+        <View
+          style={[this.props.suppressDefaultStyles ? {} : defaultStyles.textInputContainer, this.props.styles.textInputContainer]}
+        >
+          {this._renderLeftButton()}
+          <TextInputComp
+            ref="textInput"
+            editable={this.props.editable}
+            returnKeyType={this.props.returnKeyType}
+            keyboardAppearance={this.props.keyboardAppearance}
+            autoFocus={this.props.autoFocus}
+            style={[this.props.suppressDefaultStyles ? {} : defaultStyles.textInput, this.props.styles.textInput]}
+            value={this.state.text}
+            placeholder={this.props.placeholder}
+            onSubmitEditing={this.props.onSubmitEditing}
+            placeholderTextColor={this.props.placeholderTextColor}
+            onFocus={onFocus ? () => {this._onFocus(); onFocus()} : this._onFocus}
+            onBlur={this._onBlur}
+            underlineColorAndroid={this.props.underlineColorAndroid}
+            clearButtonMode={
+              clearButtonMode ? clearButtonMode : "while-editing"
+            }
+            { ...userProps }
+            onChangeText={this._handleChangeText}
+          />
+          {this._renderRightButton()}
+        </View>
         }
         {this._getFlatList()}
         {this.props.children}
@@ -787,7 +792,8 @@ GooglePlacesAutocomplete.propTypes = {
   numberOfLines: PropTypes.number,
   onSubmitEditing: PropTypes.func,
   editable: PropTypes.bool
-}
+};
+
 GooglePlacesAutocomplete.defaultProps = {
   placeholder: 'Search',
   placeholderTextColor: '#A8A8A8',
@@ -835,23 +841,4 @@ GooglePlacesAutocomplete.defaultProps = {
   numberOfLines: 1,
   onSubmitEditing: () => {},
   editable: true
-}
-
-// this function is still present in the library to be retrocompatible with version < 1.1.0
-const create = function create(options = {}) {
-  return React.createClass({
-    render() {
-      return (
-        <GooglePlacesAutocomplete
-          ref="GooglePlacesAutocomplete"
-          {...options}
-        />
-      );
-    },
-  });
-};
-
-module.exports = {
-  GooglePlacesAutocomplete,
-  create
 };
